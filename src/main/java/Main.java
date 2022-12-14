@@ -1,18 +1,43 @@
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import oracle.jdbc.OracleTypes;
 
-import java.sql.DriverManager;
+import java.sql.*;
 
 public class Main
 {
     public static void main(String[] args) throws Exception
     {
+        javaCallOracleStoreProcedure();
+    }
+
+    static void javaCallOracleStoreProcedure() throws Exception
+    {
         // load Oracle driver
         Class.forName("oracle.jdbc.driver.OracleDriver");
         // get connection
-        Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:orcl", "system", "XXX");
+        Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:orcl", "system", "XXXX");
+        //get statement object
+        String sql = "{call get_student_name(?,?)}";
+        // call store procedure
+        CallableStatement call = connection.prepareCall(sql);
+        // set the input parameter
+        call.setString(1,"001");
+        // register the output parameter
+        call.registerOutParameter(2, OracleTypes.VARCHAR);
+        // execute the store procedure
+        call.execute();
+        // get the value for the output parameter
+        String studentName = call.getString(2);
+        System.out.println("student name is " + studentName);
+        call.close();
+        connection.close();
+    }
+
+    static void javaConnectOracle() throws Exception
+    {
+        // load Oracle driver
+        Class.forName("oracle.jdbc.driver.OracleDriver");
+        // get connection
+        Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:orcl", "system", "XXXX");
         //get statement object
         String sql_statement = "select * from TSTUDENT";
         PreparedStatement pstm = connection.prepareStatement(sql_statement);
