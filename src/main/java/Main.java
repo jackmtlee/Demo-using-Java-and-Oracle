@@ -6,9 +6,32 @@ public class Main
 {
     public static void main(String[] args) throws Exception
     {
-        javaCallOracleStoreProcedure();
+//        javaCallOracleStoreProcedure();
+        javaCallOraclePackage();
     }
 
+    // execute the public function: get_student_string() from Oracle package first_pkg
+    static void javaCallOraclePackage() throws Exception
+    {
+        // load Oracle driver
+        Class.forName("oracle.jdbc.driver.OracleDriver");
+        // get connection
+        Connection connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:orcl", "system", "XXX");
+        // call the public function in Oracle package
+        String sql_statement = "select first_pkg.get_student_string from dual";
+        PreparedStatement pstm = connection.prepareStatement(sql_statement);
+        // execute the query
+        ResultSet rs = pstm.executeQuery();
+        // result output
+        while(rs.next()){
+            System.out.println("result is : " + rs.getString(1));
+        }
+        // release the resource
+        rs.close();
+        pstm.close();
+        connection.close();
+    }
+    //  execute the Oracle PL/SQL stored procedure, and get the results
     static void javaCallOracleStoreProcedure() throws Exception
     {
         // load Oracle driver
@@ -31,7 +54,7 @@ public class Main
         call.close();
         connection.close();
     }
-
+    //  execute the regular SQL statement, and get the results
     static void javaConnectOracle() throws Exception
     {
         // load Oracle driver
